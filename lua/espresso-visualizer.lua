@@ -49,7 +49,7 @@ function M._get_last_shot()
 		return
 	end
 	local shot_url = string.sub(response.body, shot_url_start, shot_url_end - 1)
-	return "https://visualizer.coffee/" .. shot_url
+	return "https://visualizer.coffee" .. shot_url
 end
 
 function M.append_last_shot(opts)
