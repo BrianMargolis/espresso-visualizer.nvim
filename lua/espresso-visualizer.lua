@@ -28,28 +28,27 @@ function M._get_last_shot()
 		vim.api.nvim_buf_set_lines(tmp_buf, 0, -1, false, vim.split(response.body, "\n"))
 	end
 
-	-- find the first instance of 'id="shots-table"'
-	local search_start = string.find(response.body, "shots-table", 1, true)
+	-- find the first instance of 'div id="shots"'
+	local search_start = string.find(response.body, 'div id="shots"', 1, true)
 	if not search_start then
-		print("failed to find shots table")
+		print("failed to find 'div id=\"shots\"'")
 		return
 	end
 
-	-- from that point, find the next occurence of data-url, and capture the text
-	-- in the following set of quotes
-	local shot_url_start = string.find(response.body, 'data-url="', search_start, true)
-	if not shot_url_start then
-		print("failed to find start of data-url")
+	-- from that point, find the first occurence of 'div id="shot_id', and extract the ID following the _
+	local shot_id_start = string.find(response.body, 'div id="shot_', search_start, true)
+	if not shot_id_start then
+		print("failed to find 'div id=\"shot_\"'")
 		return
 	end
-	shot_url_start = shot_url_start + 10
-	local shot_url_end = string.find(response.body, '"', shot_url_start, true)
-	if not shot_url_end then
-		print("failed to find end of data-url")
+	shot_id_start = shot_id_start + string.len('div id="shot_')
+	local shot_id_end = string.find(response.body, '"', shot_id_start, true)
+	if not shot_id_end then
+		print("failed to find '\" after 'div id=\"shot_\"'")
 		return
 	end
-	local shot_url = string.sub(response.body, shot_url_start, shot_url_end - 1)
-	return "https://visualizer.coffee" .. shot_url
+	local shot_id = string.sub(response.body, shot_id_start, shot_id_end - 1)
+	return "https://visualizer.coffee/shots/" .. shot_id
 end
 
 function M.append_last_shot(opts)
